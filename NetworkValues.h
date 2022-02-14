@@ -33,26 +33,21 @@ public:
 	void ForwardPropagate(float* input, float* output)
 	{
 		int hiddenLayer, parentNode, childNode;
-		float interface[INTERFACE_ARRAY_SIZE]{};
-
-		for (parentNode = 0; parentNode < MEMORY_ARRAY_SIZE; parentNode++)
-		{
-			interface[parentNode] = memory[parentNode];
-		}
-
-		for (parentNode = 0; parentNode < INPUT_ARRAY_SIZE; parentNode++)
-		{
-			interface[parentNode + MEMORY_ARRAY_SIZE] = input[parentNode];
-		}
 
 		for (parentNode = 0; parentNode < HIDDEN_ARRAY_SIZE; parentNode++)
 		{
 			hiddenSum[0][parentNode] = networkParameters->hiddenBias[0][parentNode];
 
-			for (childNode = 0; childNode < INTERFACE_ARRAY_SIZE; childNode++)
+			for (childNode = 0; childNode < MEMORY_ARRAY_SIZE; childNode++)
 			{
-				hiddenSum[0][parentNode] += networkParameters->inputWeight[parentNode][childNode] * interface[childNode];
+				hiddenSum[0][parentNode] += networkParameters->inputWeight[parentNode][childNode] * memory[childNode];
 			}
+
+			for (childNode = MEMORY_ARRAY_SIZE; childNode < INTERFACE_ARRAY_SIZE; childNode++)
+			{
+				hiddenSum[0][parentNode] += networkParameters->inputWeight[parentNode][childNode] * input[childNode - MEMORY_ARRAY_SIZE];
+			}
+
 			hiddenRelu[0][parentNode] = LeakyRELU(hiddenSum[0][parentNode]);
 		}
 
@@ -64,8 +59,9 @@ public:
 
 				for (childNode = 0; childNode < HIDDEN_ARRAY_SIZE; childNode++)
 				{
-					hiddenSum[hiddenLayer][parentNode] += networkParameters->hiddenWeight[hiddenLayer - 1][parentNode][childNode] * hiddenSum[hiddenLayer - 1][childNode];
+					hiddenSum[hiddenLayer][parentNode] += networkParameters->hiddenWeight[hiddenLayer - 1][parentNode][childNode] * hiddenRelu[hiddenLayer - 1][childNode];
 				}
+
 				hiddenRelu[hiddenLayer][parentNode] = LeakyRELU(hiddenSum[hiddenLayer][parentNode]);
 			}
 		}
@@ -76,8 +72,9 @@ public:
 
 			for (childNode = 0; childNode < HIDDEN_ARRAY_SIZE; childNode++)
 			{
-				outputSum[parentNode] += networkParameters->outputWeight[parentNode][childNode] * hiddenSum[HIDDEN_LAYERS - 1][childNode];
+				outputSum[parentNode] += networkParameters->outputWeight[parentNode][childNode] * hiddenRelu[HIDDEN_LAYERS - 1][childNode];
 			}
+
 			outputRelu[parentNode] = LeakyRELU(outputSum[parentNode]);
 		}
 
@@ -86,7 +83,7 @@ public:
 			memory[parentNode] += outputRelu[parentNode];
 		}
 
-		Softmax(outputRelu, outputSoftMax);
+		Softmax(outputRelu, outputSoftMax); // double check correct shifting
 
 		for (parentNode = 0; parentNode < INPUT_ARRAY_SIZE; parentNode++)
 		{

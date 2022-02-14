@@ -79,10 +79,10 @@ const float LLUGradient(float x)
 const void Softmax(float* input, float* output)
 {
 	int parentNode;
-	float largestValue = input[0];
+	float largestValue = input[MEMORY_ARRAY_SIZE];
 	float total = 0;
 
-	for (parentNode = MEMORY_ARRAY_SIZE; parentNode < INTERFACE_ARRAY_SIZE; parentNode++)
+	for (parentNode = MEMORY_ARRAY_SIZE + 1; parentNode < INTERFACE_ARRAY_SIZE; parentNode++)
 	{
 		if (largestValue < input[parentNode])
 		{
@@ -106,10 +106,10 @@ const void SoftmaxGradient(float* input, float* output)
 {
 	int parentNode, childNode;
 	float numerator[INPUT_ARRAY_SIZE]{};
-	float largestValue = input[0];
+	float largestValue = input[MEMORY_ARRAY_SIZE];
 	float total = 0;
 
-	for (parentNode = MEMORY_ARRAY_SIZE; parentNode < INTERFACE_ARRAY_SIZE; parentNode++)
+	for (parentNode = MEMORY_ARRAY_SIZE + 1; parentNode < INTERFACE_ARRAY_SIZE; parentNode++)
 	{
 		if (largestValue < input[parentNode])
 		{
@@ -129,7 +129,7 @@ const void SoftmaxGradient(float* input, float* output)
 	{
 		for (childNode = 0; childNode < INPUT_ARRAY_SIZE; childNode++)
 		{
-			if (parentNode != childNode)
+			if (parentNode != childNode) // optimize
 			{
 				numerator[parentNode] += exp(output[parentNode] + output[childNode]);
 			}

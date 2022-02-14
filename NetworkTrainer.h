@@ -2,14 +2,13 @@
 #define NETWORKTRAINER_H_
 
 #include "Environment.h"
-#include "NetworkGradients.h"
+#include "NetworkParameterGradients.h"
 
 class NetworkTrainer
 {
 public:
 	NetworkParameters* networkParameters;
 	NetworkValues networkValues[SEQUENCE_SIZE];
-	NetworkGradients networkGradients[SEQUENCE_SIZE];
 	Environment environment;
 	float input[INPUT_ARRAY_SIZE]{};
 	float output[INPUT_ARRAY_SIZE]{};
@@ -25,7 +24,10 @@ public:
 		for (int iteration = 0; iteration < iterations; iteration++)
 		{
 			NetworkValues networkValue;
+			NetworkValueGradients networkValueGradient;
+
 			networkValue.Initialize(networkParameters);
+			networkValueGradient.Initialize(&networkValue);
 
 			for (int i = 0; i < SEQUENCE_SIZE; i++)
 			{
@@ -34,7 +36,14 @@ public:
 				environment.ForwardPropagate();
 				networkValues[networkValue] = networkValue;
 			}
-			environment.GetOutput(output);
+
+			for (int i = 0; i < SEQUENCE_SIZE; i++)
+			{
+				environment.GetOutput(output);
+				networkValue.ForwardPropagate(input, output);
+				environment.ForwardPropagate();
+				networkValues[networkValue] = networkValue;
+			}
 		}
 	}
 };
