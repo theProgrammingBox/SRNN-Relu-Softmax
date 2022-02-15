@@ -16,6 +16,8 @@ using std::cin;
 using std::setw;
 using std::cout;
 using std::endl;
+using std::left;
+using std::right;
 using std::fixed;
 using std::string;
 using std::ifstream;
@@ -29,16 +31,16 @@ const int FLOAT_SIZE = 14;
 
 /*Training Parameters*/
 const float LEARNING_RATE = 0.001;
-const int BATCH_SIZE = 2;
-const int SEQUENCE_SIZE = 10;
+const int BATCH_SIZE = 10;
+const int SEQUENCE_SIZE = 3;
 
 /*Network Parameters*/
 const float STARTING_PARAMETER_RANGE = 0.1;	// defines the +- range of starting parameters
-const int INPUT_ARRAY_SIZE = 2;			// used for both x and output (option probabilities), (x >= 1)
-const int MEMORY_ARRAY_SIZE = 100;			// number of memory values 'passed' to next iteration, (x >= 1)
+const int INPUT_ARRAY_SIZE = 2;			// used for both x and output (option probabilities), (x >= 2) cuz softmax needs at least 2 options
+const int MEMORY_ARRAY_SIZE = 10;			// number of memory values 'passed' to next iteration, (x >= 1)
 const int INTERFACE_ARRAY_SIZE = MEMORY_ARRAY_SIZE + INPUT_ARRAY_SIZE;	// x and output size of network
-const int HIDDEN_ARRAY_SIZE = 100;			// nodes in each hidden layer, (x >= 1)
-const int HIDDEN_LAYERS = 5;				// (x >= 2)
+const int HIDDEN_ARRAY_SIZE = 10;			// nodes in each hidden layer, (x >= 1)
+const int HIDDEN_LAYERS = 4;				// (x >= 2)
 
 const float LeakyRELU(float x) // Leaky Rectified Linear Unit
 {
